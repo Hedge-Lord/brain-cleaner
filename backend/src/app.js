@@ -4,8 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const pdftoroute = require('./routes/pdftobrainrot');
-const authRoutes = require('./routes/auth');
+const pdftoroute = require('./routes/pdftobrainrot.routes');
+const authRoutes = require('./routes/auth.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
