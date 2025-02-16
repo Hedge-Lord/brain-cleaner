@@ -21,6 +21,7 @@ exports.register = async (req, res) => {
       [email, hashedPassword]
     );
     
+    console.log(process.env)
     // Generate JWT token
     const token = jwt.sign(
       { id: result.rows[0].id, email: result.rows[0].email },
