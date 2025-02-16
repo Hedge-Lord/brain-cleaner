@@ -1,0 +1,36 @@
+.loading-page {
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.loading-content {
+  text-align: center;
+  color: white;
+  padding: 2rem;
+}
+
+.get-started-btn {
+  padding: 12px 24px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 25px;
+  background-color: white;
+  color: #6e8efb;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.get-started-btn:hover {
+  transform: scale(1.05);
+}
