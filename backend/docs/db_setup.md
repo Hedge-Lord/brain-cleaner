@@ -28,7 +28,7 @@ For local development, follow these steps to set up your PostgreSQL database:
      ```sql
      \du
      ```
-   - **Create a New User (if needed):**  
+   - **Create a New User (if needed):**   
      In the `psql` shell, run:
      ```sql
      CREATE USER myuser WITH PASSWORD 'mypassword';
