@@ -19,7 +19,7 @@ const ExecOrderPage = () => {
     <div className="exec-order-page">
       <nav className="navbar">
         <Link to="/main">Home</Link>
-        <Link to="/exec-order">Exec Order</Link>
+        <Link to="/">Log Out</Link>
       </nav>
 
       <div className="video-feed">

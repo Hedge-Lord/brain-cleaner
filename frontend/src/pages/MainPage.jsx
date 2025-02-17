@@ -1,10 +1,18 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../App";
 import "./MainPage.css";
 
 const MainPage = () => {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previousVideos, setPreviousVideos] = useState([]);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   const handleFileUpload = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -18,8 +26,16 @@ const MainPage = () => {
   return (
     <div className="main-page">
       <nav className="navbar">
-        <Link to="/main">Home</Link>
-        <Link to="/exec-order">Exec Order</Link>
+        <div className="nav-left">
+          <Link to="/main">Home</Link>
+          <Link to="/exec-order">Exec Order</Link>
+        </div>
+        <div className="nav-right">
+          <span className="user-email">{user?.email}</span>
+          <button onClick={handleLogout} className="logout-btn">
+            Logout
+          </button>
+        </div>
       </nav>
 
       <div className="converter-section">
@@ -32,7 +48,7 @@ const MainPage = () => {
             id="pdf-upload"
           />
           <label htmlFor="pdf-upload" className="upload-btn">
-            Select PDF
+            {selectedFile ? selectedFile.name : "Select PDF"}
           </label>
           {selectedFile && (
             <button onClick={handleConversion} className="convert-btn">
