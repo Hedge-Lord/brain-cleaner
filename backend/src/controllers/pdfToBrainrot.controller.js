@@ -74,43 +74,47 @@ exports.processPdf = async (req, res) => {
             }),
         };
 
-       const response = await fetch("https://api.chunkr.ai/api/v1/task/parse", options);
-const data = await response.json();
-console.log("Chunkr API response:", data);
+      const response = await fetch("https://api.chunkr.ai/api/v1/task/parse", options);
+const text = await response.text(); // Read response as text
 
-if (!response.ok) {
-    return res.status(500).json({ error: "Failed to process PDF" });
-}
+console.log(" RAW Chunkr API Response:", text); // Print full response
 
-// ✅ Extract text from Chunkr's response
-let extractedText = "";
-if (data.output && data.output.chunks) {
-    data.output.chunks.forEach(chunk => {
-        chunk.segments.forEach(segment => {
-            extractedText += segment.text + " ";
-        });
-    });
-} else {
-    return res.status(500).json({ error: "Invalid Chunkr response format" });
-}
+try {
+    const data = JSON.parse(text); // Try parsing as JSON
+    console.log("Chunkr API Parsed Response:", data);
 
-console.log("🔥 Extracted Text for Script:", extractedText.substring(0, 500) + "...");
-
-// ✅ Send extracted text to OpenAI to generate script
-const script = await generateVideoScript(data);
-
-// ✅ Return the final script in JSON format
-return res.status(200).json({
-    message: "Video script generated successfully",
-    script: script
-});
-
-
-    } catch (error) {
-        console.error("Error processing PDF:", error);
-        res.status(500).json({ error: "Failed to process PDF" });
+    if (!response.ok) {
+        return res.status(500).json({ error: "Failed to process PDF", raw_response: data });
     }
-};
+
+    // ✅ Extract text from Chunkr's response
+    let extractedText = "";
+    if (data.output && data.output.chunks) {
+        data.output.chunks.forEach(chunk => {
+            chunk.segments.forEach(segment => {
+                extractedText += segment.text + " ";
+            });
+        });
+    } else {
+        return res.status(500).json({ error: "Invalid Chunkr response format" });
+    }
+
+    console.log(" Extracted Text for Script:", extractedText.substring(0, 500) + "...");
+
+    // ✅ Send extracted text to OpenAI to generate script
+    const script = await generateVideoScript(data);
+
+    // ✅ Return the final script in JSON format
+    return res.status(200).json({
+        message: "Video script generated successfully",
+        script: script
+    });
+
+} catch (error) {
+    console.error("🔥 Error Parsing JSON:", error);
+    return res.status(500).json({ error: "Invalid JSON response from Chunkr", raw_response: text });
+}
+
 
 // Export Multer middleware for routes
 exports.upload = upload;
