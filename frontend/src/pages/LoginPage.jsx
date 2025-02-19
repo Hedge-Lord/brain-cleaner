@@ -57,6 +57,7 @@ const LoginPage = () => {
               type="email"
               id="email"
               value={formData.email}
+              placeholder="Enter your email"
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
@@ -70,6 +71,7 @@ const LoginPage = () => {
               type="password"
               id="password"
               value={formData.password}
+              placeholder="Enter your password"
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }

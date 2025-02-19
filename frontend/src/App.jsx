@@ -40,7 +40,7 @@ function App() {
       setUser({ email: foundUser.email });
       return { success: true };
     }
-    return { success: false, error: "Invalid email or password" };
+    return { success: false, error: "Invalid email or password!" };
   };
 
   const register = async (email, password) => {

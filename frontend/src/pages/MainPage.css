@@ -18,11 +18,18 @@
   text-decoration: none;
   color: #333;
   font-weight: 500;
+  font-size: 1.1rem;
+  transition: color 0.2s;
+}
+
+.navbar a:hover {
+  color: #6e8efb;
 }
 
 .user-email {
-  color: #666;
-  margin-right: 1rem;
+  color: #555;
+  font-size: 0.95rem;
+  margin-right: 1.5rem;
 }
 
 .logout-btn {
@@ -43,6 +50,14 @@
 .converter-section {
   padding: 2rem;
   text-align: center;
+}
+
+.converter-section h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2rem;
+  letter-spacing: -0.5px;
 }
 
 .upload-container {
@@ -105,4 +120,25 @@
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.video-card p {
+  margin-top: 0.5rem;
+  color: #444;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.previous-videos h2 {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #333;
+  margin: 2rem 0;
+  text-align: center;
+  letter-spacing: -0.3px;
+}
+
+.main-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
 }
