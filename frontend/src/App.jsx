@@ -1,15 +1,15 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, createContext, useContext } from "react";
-import "./App.css";
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import LoadingPage from "./pages/LoadingPage";
 import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
 import ExecOrderPage from "./pages/ExecOrderPage";
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import "./App.css";
 
 export const AuthContext = createContext(null);
 
@@ -71,24 +71,40 @@ function App() {
   };
 
   return (
-    <AuthContext.Provider value={authValue}>
+    <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<LoadingPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/main"
-            element={isAuthenticated ? <MainPage /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/exec-order"
+          <Route path="/register" element={<Register />} />
+          <Route 
+            path="/main" 
             element={
-              isAuthenticated ? <ExecOrderPage /> : <Navigate to="/login" />
-            }
+              <ProtectedRoute>
+                <MainPage />
+              </ProtectedRoute>
+            } 
           />
+          <Route 
+            path="/exec-order" 
+            element={
+              <ProtectedRoute>
+                <ExecOrderPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/" element={<LoadingPage />} />
         </Routes>
       </Router>
-    </AuthContext.Provider>
+    </AuthProvider>
   );
 }
 
