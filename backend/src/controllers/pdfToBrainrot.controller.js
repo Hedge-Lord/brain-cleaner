@@ -33,9 +33,6 @@ const getTaskStatus = async (task_id) => {
 };
 
 exports.processPdf = async (req, res) => {
-    console.log("Received file:", req.file);
-    console.log("Received body:", req.body);
-
     try {
         // Extract file URL and name from request body
         const { file, file_name } = req.body;
@@ -61,7 +58,16 @@ exports.processPdf = async (req, res) => {
             }),
           };
 
+          console.log('Sending PDF to Chunkr API', options);
+
         const response = await fetch("https://api.chunkr.ai/api/v1/task/parse", options);
+
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text();
+            throw new Error(`Expected JSON but got ${contentType}. Response body: ${text}`);
+        }
+
         const data = await response.json();
         console.log('Chunkr API response:', data);
 
@@ -116,9 +122,7 @@ exports.processPdf = async (req, res) => {
         res.status(500).json({ error: 'Failed to process PDF' });
     }
 
-
-
-
+    return;
 
 
     

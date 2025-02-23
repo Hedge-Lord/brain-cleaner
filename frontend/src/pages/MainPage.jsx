@@ -18,10 +18,72 @@ const MainPage = () => {
     setSelectedFile(e.target.files[0]);
   };
 
+  const getS3UploadURL = async (file) => {
+    try {
+      const res = await fetch("http://localhost:3000/api/v1/upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName: file.name, fileType: file.type }),
+      });
+
+      console.log("res", res);
+  
+      if (!res.ok) throw new Error("Failed to fetch S3 upload URL");
+      const { uploadURL } = await res.json();
+      return uploadURL;
+    } catch (error) {
+      console.error("Error getting S3 upload URL:", error);
+      return null;
+    }
+  };
+  
+  const uploadFileToS3 = async (uploadURL, file) => {
+    try {
+      await fetch(uploadURL, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+      console.log("PDF uploaded to S3");
+    } catch (error) {
+      console.error("Error uploading file to S3:", error);
+      throw error;
+    }
+  };
+
   const handleConversion = async () => {
     if (!selectedFile) return;
-    // Add PDF to video conversion logic here
+  
+    try {
+      console.log("handleConversion");
+      // Generate a pre-signed (temporary) URL without credentials
+      const s3UploadURL = await getS3UploadURL(selectedFile);
+      console.log("S3 Upload URL:", s3UploadURL);
+      if (!s3UploadURL) throw new Error("Failed to get S3 upload URL");
+  
+      // Upload file to S3 using pre-signed URL
+      await uploadFileToS3(s3UploadURL, selectedFile);
+      const fileUrl = s3UploadURL.split("?")[0]; // Get public file URL (remove query params if any)
+
+      console.log("File URL:", fileUrl);
+  
+      // Send file URL to backend for processing
+      const response = await fetch("http://localhost:3000/api/v1/pdftobrainrot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ file: fileUrl, file_name: selectedFile.name }),
+      });
+  
+      if (!response.ok) throw new Error("Backend processing failed");
+  
+      const result = await response.json();
+      console.log("Conversion successful:", result);
+  
+    } catch (error) {
+      console.error("Error during conversion:", error);
+    }
   };
+  
 
   return (
     <div className="main-page">
