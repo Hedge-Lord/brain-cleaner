@@ -3,21 +3,45 @@ require("dotenv").config();
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // Function to extract text from Chunkr API response
+// const extractTextFromChunkr = (chunkrData) => {
+//     let extractedText = "";
+//     chunkrData.output.chunks.forEach(chunk => {
+//         chunk.segments.forEach(segment => {
+//             extractedText += segment.text + " "; // Combine all text
+//         });
+//     });
+//     return extractedText.trim();
+// };
+
+// function2: 
+
 const extractTextFromChunkr = (chunkrData) => {
-    let extractedText = "";
-    chunkrData.output.chunks.forEach(chunk => {
-        chunk.segments.forEach(segment => {
-            extractedText += segment.text + " "; // Combine all text
-        });
-    });
-    return extractedText.trim();
-};
+    if (!chunkrData || !chunkrData.output || !chunkrData.output.chunks) {
+      throw new Error('Invalid Chunkr data structure');
+    }
+  
+    // Collect only the markdown or content from each segment
+    const segments = chunkrData.output.chunks.flatMap(chunk => {
+      return (chunk.segments || []).map(segment => {
+        return segment.markdown ? segment.markdown : segment.content ? segment.content : '';
+      });
+    }).filter(text => text.trim() !== '');
+  
+    // Return a JSON object with the extracted segments as an array,
+    // and also a combined string if needed.
+    return {
+      segments: segments,
+      combinedText: segments.join("\n\n")
+    };
+  };
+  
 
 // Function to generate a video script using OpenAI
 exports.generateVideoScript = async (chunkrData) => {
     try {
         // Extract full text from Chunkr's response
         const extractedText = extractTextFromChunkr(chunkrData);
+        // const extractedText = chunkrData;
 
         // Define OpenAI prompt for script generation
         const prompt = `
