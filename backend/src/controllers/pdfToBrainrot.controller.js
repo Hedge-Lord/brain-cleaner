@@ -93,15 +93,22 @@ exports.processPdf = async (req, res) => {
             }
             if (status === "Succeeded") {
                 console.log("Task succeeded:", taskData);
-                for (let chunk of taskData.output.chunks) {
-                    for (let segment of chunk.segments) {
-                        console.log(segment);
-                    }
-                }
-                return res.status(200).json({
-                    message: 'PDF processing completed successfully',
-                    // task_status: taskData
-                });
+    try {
+        // Send the taskData to OpenAI for script generation
+        const script = await generateVideoScript(taskData);
+        
+        return res.status(200).json({
+            message: 'PDF processing and script generation completed successfully',
+            script: script, // openAI part
+            chunkr_data: taskData
+        });
+    } catch (error) {
+        console.error('Error generating script:', error);
+        return res.status(500).json({ 
+            error: 'Script generation failed',
+            chunkr_data: taskData  // Still return Chunkr data even if script gen fails
+        });
+    }
             }
         }
     } catch (error) {
