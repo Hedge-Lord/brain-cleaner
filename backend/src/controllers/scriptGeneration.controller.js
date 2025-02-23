@@ -10,7 +10,13 @@ const extractTextFromChunkr = (chunkrData) => {
             extractedText += segment.text + " "; // Combine all text
         });
     });
-    return extractedText.trim();
+
+    extractedText = extractedText.trim(); // Clean up spaces
+
+    // Log the extracted text to see what we are sending to OpenAI
+    console.log("Extracted Text from Chunkr API:", extractedText);
+
+    return extractedText;
 };
 
 // Function to generate a video script using OpenAI
@@ -30,6 +36,9 @@ exports.generateVideoScript = async (chunkrData) => {
         ${extractedText}
         `;
 
+        // Log the prompt being sent to OpenAI
+        console.log("OpenAI Prompt:", prompt);
+
         // Send request to OpenAI
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
@@ -44,7 +53,17 @@ exports.generateVideoScript = async (chunkrData) => {
         });
 
         const data = await response.json();
-        if (!response.ok) throw new Error(`OpenAI API Error: ${JSON.stringify(data)}`);
+
+        // Log the full response from OpenAI
+        console.log("Full OpenAI API Response:", JSON.stringify(data, null, 2));
+
+        // Handle API errors
+        if (!response.ok) {
+            throw new Error(`OpenAI API Error: ${JSON.stringify(data)}`);
+        }
+
+        // Log the final output (generated script)
+        console.log("Generated Video Script:", data.choices[0].message.content);
 
         return data.choices[0].message.content; // Return script as text
     } catch (error) {
@@ -52,3 +71,4 @@ exports.generateVideoScript = async (chunkrData) => {
         throw error;
     }
 };
+
