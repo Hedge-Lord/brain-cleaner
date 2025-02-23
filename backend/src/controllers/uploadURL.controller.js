@@ -14,16 +14,18 @@ exports.getUploadURL = async (req, res) => {
 
     console.log("Generating pre-signed URL for:", fileName, fileType);
 
-    // const params = {
-    //   Bucket: process.env.AWS_S3_BUCKET_NAME,
-    //   Key: `uploads/${Date.now()}-${fileName}`,
-    //   ContentType: fileType,
-    //   Expires: 60, // URL valid for 60 seconds
-    // };
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: `uploads/${Date.now()}-${fileName}`,
+      ContentType: fileType,
+      Expires: 600, // URL valid for 600 seconds
+    };
 
-    // const uploadURL = await s3.getSignedUrlPromise("putObject", params);
+    const uploadURL = await s3.getSignedUrlPromise("putObject", params);
 
-    // res.json({ uploadURL });
+    console.log(uploadURL);
+
+    res.json({ uploadURL });
   } catch (error) {
     console.error("Error generating upload URL:", error);
     res.status(500).json({ error: "Failed to generate upload URL" });
