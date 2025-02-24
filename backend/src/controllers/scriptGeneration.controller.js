@@ -24,10 +24,10 @@ exports.generateVideoScript = async (chunkrData) => {
         You are an AI scriptwriter. Convert the following text into a **natural, engaging video script**.
         - Maintain **technical accuracy** but make it **easy to understand**.
         - The script should feel **conversational** and **engaging for a general audience**.
-        - Limit the script to **around 1 minute** (~700 words max).
+        - Limit the script to **around 1 minute** (~700 words max) and return in JSON format.
 
         Here is the input text:
-        ${extractedText}
+        ${JSON.stringify(extractedText, null, 2)}
         `;
 
         // Send request to OpenAI
