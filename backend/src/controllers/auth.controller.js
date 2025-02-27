@@ -2,11 +2,20 @@ const db = require('../db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+
+const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+
 exports.register = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if user already exists
+    //debugging stuff
+    if (!email || !password) {
+      console.log('Missing email or password');
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+
     const existingUser = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     if (existingUser.rows.length > 0) {
       return res.status(400).json({ message: 'User already exists' });
@@ -21,14 +30,15 @@ exports.register = async (req, res) => {
       [email, hashedPassword]
     );
     
-    console.log(process.env)
+    console.log('User inserted, generating token...');
     // Generate JWT token
-    const token = jwt.sign(
-      { id: result.rows[0].id, email: result.rows[0].email },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
+    const payload = { id: result.rows[0].id, email: result.rows[0].email };
+    console.log('Token payload:', payload);
+    
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+    console.log('Token generated successfully');
 
+    console.log('User registered successfully:', email);
     return res.status(201).json({
       message: 'User registered successfully',
       token,
@@ -39,7 +49,6 @@ exports.register = async (req, res) => {
     });
   } catch (err) {
     console.error('Error during registration:', err);
-    return res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -47,7 +56,11 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Find the user by email
+    // more debugging 
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
     const user = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     if (user.rows.length === 0) {
       return res.status(400).json({ message: 'Invalid email or password' });
@@ -62,10 +75,11 @@ exports.login = async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { id: user.rows[0].id, email: user.rows[0].email },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: '24h' }
     );
 
+    console.log('User logged in successfully:', email); 
     return res.status(200).json({
       message: 'Login successful',
       token,
@@ -76,7 +90,8 @@ exports.login = async (req, res) => {
     });
   } catch (err) {
     console.error('Error during login:', err);
-    return res.status(500).json({ message: 'Server error' });
+    console.error('Error stack:', err.stack);
+    return res.status(500).json({ message: 'Server error during login' });
   }
 };
 

@@ -4,7 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 import "./App.css";
 import LoadingPage from "./pages/LoadingPage";
 import LoginPage from "./pages/LoginPage";
@@ -22,42 +22,97 @@ export const useAuth = () => {
 };
 
 // Fake user database
-const FAKE_USERS = [{ email: "test@test.com", password: "test123" }];
+// const FAKE_USERS = [{ email: "test@test.com", password: "test123" }];
+const API_URL = 'http://localhost:3000/api/v1';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('token');
+    if (token) {
+      checkAuthStatus(token);
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  const checkAuthStatus = async (token) => {
+    try {
+      const response = await fetch(`${API_URL}/auth/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        setIsAuthenticated(true);
+      } else {
+        localStorage.removeItem('token');
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      localStorage.removeItem('token');
+    }
+    setLoading(false);
+  };
 
   const login = async (email, password) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const foundUser = FAKE_USERS.find(
-      (u) => u.email === email && u.password === password
-    );
-    if (foundUser) {
-      setIsAuthenticated(true);
-      setUser({ email: foundUser.email });
-      return { success: true };
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        setIsAuthenticated(true);
+        setUser(data.user);
+        return { success: true };
+      }
+      return { success: false, error: data.message || 'Login failed' };
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, error: 'An unexpected error occurred' };
     }
-    return { success: false, error: "Invalid email or password!" };
   };
 
   const register = async (email, password) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (FAKE_USERS.some((u) => u.email === email)) {
-      return { success: false, error: "User already exists" };
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        setIsAuthenticated(true);
+        setUser(data.user);
+        return { success: true };
+      }
+      return { success: false, error: data.message || 'Registration failed' };
+    } catch (error) {
+      console.error('Registration error:', error);
+      return { success: false, error: 'An unexpected error occurred' };
     }
-
-    FAKE_USERS.push({ email, password });
-    setIsAuthenticated(true);
-    setUser({ email });
-    return { success: true };
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
     setIsAuthenticated(false);
     setUser(null);
   };
@@ -68,25 +123,30 @@ function App() {
     login,
     register,
     logout,
+    loading,
   };
 
   return (
     <AuthContext.Provider value={authValue}>
       <Router>
-        <Routes>
-          <Route path="/" element={<LoadingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/main"
-            element={isAuthenticated ? <MainPage /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/exec-order"
-            element={
-              isAuthenticated ? <ExecOrderPage /> : <Navigate to="/login" />
-            }
-          />
-        </Routes>
+        {loading ? (
+          <LoadingPage />
+        ) : (
+          <Routes>
+            <Route path="/" element={<LoadingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/main"
+              element={isAuthenticated ? <MainPage /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/exec-order"
+              element={
+                isAuthenticated ? <ExecOrderPage /> : <Navigate to="/login" />
+              }
+            />
+          </Routes>
+        )}
       </Router>
     </AuthContext.Provider>
   );

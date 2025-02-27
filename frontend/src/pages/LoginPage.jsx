@@ -18,28 +18,35 @@ const LoginPage = () => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
+    
+    if (!formData.email || !formData.password) {
+      setError("Email and password are required");
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      if (isRegistering) {
-        const result = await register(formData.email, formData.password);
-        if (result.success) {
-          navigate("/main");
-        } else {
-          setError(result.error || "Registration failed");
-        }
+      const result = isRegistering 
+        ? await register(formData.email, formData.password)
+        : await login(formData.email, formData.password);
+
+      if (result.success) {
+        navigate("/main");
       } else {
-        const result = await login(formData.email, formData.password);
-        if (result.success) {
-          navigate("/main");
-        } else {
-          setError(result.error || "Login failed");
-        }
+        setError(result.error || `${isRegistering ? "Registration" : "Login"} failed`);
       }
     } catch (err) {
-      setError("An unexpected error occurred");
+      console.error('Auth error:', err);
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const switchMode = () => {
+    setIsRegistering(!isRegistering);
+    setError("");
+    setFormData({ email: "", password: "" });
   };
 
   return (
@@ -59,7 +66,7 @@ const LoginPage = () => {
               value={formData.email}
               placeholder="Enter your email"
               onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
+                setFormData({ ...formData, email: e.target.value.trim() })
               }
               required
               disabled={isLoading}
@@ -77,6 +84,7 @@ const LoginPage = () => {
               }
               required
               disabled={isLoading}
+              minLength={6}
             />
           </div>
           <button type="submit" className="login-btn" disabled={isLoading}>
@@ -95,17 +103,19 @@ const LoginPage = () => {
               Already have an account?{" "}
               <button
                 className="text-button"
-                onClick={() => setIsRegistering(false)}
+                onClick={switchMode}
+                disabled={isLoading}
               >
                 Login here
               </button>
             </p>
           ) : (
             <p>
-              Don't have an account?{" "}
+              Need an account?{" "}
               <button
                 className="text-button"
-                onClick={() => setIsRegistering(true)}
+                onClick={switchMode}
+                disabled={isLoading}
               >
                 Create one here
               </button>
