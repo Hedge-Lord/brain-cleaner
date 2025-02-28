@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../App";
+import { GoogleLogin } from '@react-oauth/google';
 import "./LoginPage.css";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, register } = useAuth();
+  const { login, register, handleGoogleLogin } = useAuth();
   const [isRegistering, setIsRegistering] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -13,6 +14,24 @@ const LoginPage = () => {
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError("");
+    setIsLoading(true);
+    try {
+      const result = await handleGoogleLogin(credentialResponse);
+      if (result.success) {
+        navigate("/main");
+      } else {
+        setError(result.error || "Google login failed");
+      }
+    } catch (err) {
+      console.error('Google auth error:', err);
+      setError("An unexpected error occurred during Google login");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,77 +69,67 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-page">
-      <button className="back-button" onClick={() => navigate("/")}>
-        ← Back
-      </button>
-      <div className="login-form-container">
-        <h1>{isRegistering ? "Create Account" : "Login to Brain Cleaner"}</h1>
+    <div className="login-container">
+      <div className="login-box">
+        <h2>{isRegistering ? "Create Account" : "Log In"}</h2>
+        
+        <div className="google-login-container">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => {
+              setError('Google Login Failed');
+            }}
+            auto_select
+          />
+        </div>
+
+        <div className="separator">
+          <span>or</span>
+        </div>
+
         {error && <div className="error-message">{error}</div>}
-        <form onSubmit={handleSubmit}>
+        
+        <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
+              placeholder="Email"
               value={formData.email}
-              placeholder="Enter your email"
               onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value.trim() })
+                setFormData({ ...formData, email: e.target.value })
               }
-              required
-              disabled={isLoading}
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password">Password</label>
             <input
               type="password"
               id="password"
+              placeholder="Password"
               value={formData.password}
-              placeholder="Enter your password"
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
-              required
-              disabled={isLoading}
-              minLength={6}
             />
           </div>
-          <button type="submit" className="login-btn" disabled={isLoading}>
+          <button type="submit" disabled={isLoading}>
             {isLoading
-              ? isRegistering
-                ? "Creating Account..."
-                : "Logging in..."
+              ? "Loading..."
               : isRegistering
               ? "Create Account"
-              : "Login"}
+              : "Log In"}
           </button>
         </form>
+        
         <div className="auth-switch">
-          {isRegistering ? (
-            <p>
-              Already have an account?{" "}
-              <button
-                className="text-button"
-                onClick={switchMode}
-                disabled={isLoading}
-              >
-                Login here
-              </button>
-            </p>
-          ) : (
-            <p>
-              Need an account?{" "}
-              <button
-                className="text-button"
-                onClick={switchMode}
-                disabled={isLoading}
-              >
-                Create one here
-              </button>
-            </p>
-          )}
+          <span>
+            {isRegistering
+              ? "Already have an account?"
+              : "Don't have an account?"}
+          </span>
+          <button onClick={switchMode}>
+            {isRegistering ? "Log In" : "Sign Up"}
+          </button>
         </div>
       </div>
     </div>
