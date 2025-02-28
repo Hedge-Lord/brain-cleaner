@@ -10,6 +10,8 @@ import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
 import ExecOrderPage from "./pages/ExecOrderPage";
 import LoadingPage from "./pages/LoadingPage";
+import VerificationPending from "./pages/VerificationPending";
+import VerificationSuccess from "./pages/VerificationSuccess";
 import { jwtDecode } from "jwt-decode";
 import { googleLogout } from '@react-oauth/google';
 
@@ -175,6 +177,14 @@ function App() {
                 <LoginPage />
               )
             }
+          />
+          <Route
+            path="/verify-pending"
+            element={<VerificationPending />}
+          />
+          <Route
+            path="/verify-email"
+            element={<VerificationSuccess />}
           />
           <Route
             path="/main"

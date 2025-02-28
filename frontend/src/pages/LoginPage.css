@@ -177,7 +177,11 @@
 
 .auth-switch button:hover {
   color: #357abd;
-  text-decoration: underline;
+  text-decoration: none;
+}
+
+.auth-switch button:focus {
+  outline: none;
 }
 
 .auth-switch p {
@@ -195,5 +199,5 @@
 }
 
 .text-button:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }

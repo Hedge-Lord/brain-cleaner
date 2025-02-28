@@ -45,14 +45,31 @@ const LoginPage = () => {
     }
 
     try {
-      const result = isRegistering 
-        ? await register(formData.email, formData.password)
-        : await login(formData.email, formData.password);
+      if (isRegistering) {
+        const response = await fetch("http://localhost:3000/api/v1/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
 
-      if (result.success) {
-        navigate("/main");
+        const data = await response.json();
+
+        if (response.ok) {
+          // Instead of logging in directly, redirect to verification pending
+          navigate('/verify-pending', { state: { email: formData.email } });
+        } else {
+          setError(data.message || "Registration failed");
+        }
       } else {
-        setError(result.error || `${isRegistering ? "Registration" : "Login"} failed`);
+        const result = await login(formData.email, formData.password);
+
+        if (result.success) {
+          navigate("/main");
+        } else {
+          setError(result.error || "Login failed");
+        }
       }
     } catch (err) {
       console.error('Auth error:', err);
