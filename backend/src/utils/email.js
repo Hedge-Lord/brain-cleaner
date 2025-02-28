@@ -1,4 +1,6 @@
+require('dotenv').config({ path: '../.env' }); 
 const nodemailer = require('nodemailer');
+
 
 // Create reusable transporter
 const transporter = nodemailer.createTransport({
@@ -6,8 +8,8 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: 'vest.chunkr@gmail.com',
-    pass: 'oskfyjjsruipueyt'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
   }
 });
 
@@ -25,7 +27,7 @@ exports.sendVerificationEmail = async (email, token) => {
   const verificationUrl = `http://localhost:5173/verify-email?token=${token}`;
   
   const mailOptions = {
-    from: 'vest.chunkr@gmail.com',
+    from: process.env.EMAIL_USER,
     to: email,
     subject: 'Verify your Brain Cleaner account',
     html: `
