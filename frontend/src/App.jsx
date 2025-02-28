@@ -6,10 +6,14 @@ import {
 } from "react-router-dom";
 import { useState, createContext, useContext, useEffect } from "react";
 import "./App.css";
-import LoadingPage from "./pages/LoadingPage";
 import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
 import ExecOrderPage from "./pages/ExecOrderPage";
+import LoadingPage from "./pages/LoadingPage";
+import VerificationPending from "./pages/VerificationPending";
+import VerificationSuccess from "./pages/VerificationSuccess";
+import { jwtDecode } from "jwt-decode";
+import { googleLogout } from '@react-oauth/google';
 
 export const AuthContext = createContext(null);
 
@@ -21,44 +25,48 @@ export const useAuth = () => {
   return context;
 };
 
-// Fake user database
-// const FAKE_USERS = [{ email: "test@test.com", password: "test123" }];
 const API_URL = 'http://localhost:3000/api/v1';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is already logged in
     const token = localStorage.getItem('token');
-    if (token) {
+    const googleToken = localStorage.getItem('googleToken');
+    
+    if (googleToken) {
+      try {
+        const decoded = jwtDecode(googleToken);
+        // Check if token is expired
+        const currentTime = Date.now() / 1000;
+        if (decoded.exp && decoded.exp > currentTime) {
+          setUser(decoded);
+          setIsAuthenticated(true);
+        } else {
+          localStorage.removeItem('googleToken');
+        }
+      } catch (error) {
+        console.error('Error with Google token:', error);
+        localStorage.removeItem('googleToken');
+      }
+    } else if (token) {
       checkAuthStatus(token);
-    } else {
-      setLoading(false);
     }
   }, []);
 
   const checkAuthStatus = async (token) => {
     try {
-      const response = await fetch(`${API_URL}/auth/profile`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
+      const decoded = jwtDecode(token);
+      if (decoded) {
+        setUser(decoded);
         setIsAuthenticated(true);
-      } else {
-        localStorage.removeItem('token');
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      console.error('Error checking auth status:', error);
       localStorage.removeItem('token');
     }
-    setLoading(false);
   };
 
   const login = async (email, password) => {
@@ -75,14 +83,28 @@ function App() {
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        setIsAuthenticated(true);
         setUser(data.user);
+        setIsAuthenticated(true);
         return { success: true };
+      } else {
+        return { success: false, error: data.message };
       }
-      return { success: false, error: data.message || 'Login failed' };
     } catch (error) {
       console.error('Login error:', error);
       return { success: false, error: 'An unexpected error occurred' };
+    }
+  };
+
+  const handleGoogleLogin = (credentialResponse) => {
+    try {
+      const decoded = jwtDecode(credentialResponse.credential);
+      setUser(decoded);
+      setIsAuthenticated(true);
+      localStorage.setItem('googleToken', credentialResponse.credential);
+      return { success: true };
+    } catch (error) {
+      console.error('Google login error:', error);
+      return { success: false, error: 'Failed to process Google login' };
     }
   };
 
@@ -112,41 +134,79 @@ function App() {
   };
 
   const logout = () => {
+    // Handle Google logout
+    if (localStorage.getItem('googleToken')) {
+      googleLogout();
+      localStorage.removeItem('googleToken');
+    }
+    // Handle regular logout
     localStorage.removeItem('token');
     setIsAuthenticated(false);
     setUser(null);
   };
 
-  const authValue = {
+  const authContextValue = {
     isAuthenticated,
     user,
     login,
     register,
     logout,
-    loading,
+    handleGoogleLogin,
   };
 
   return (
-    <AuthContext.Provider value={authValue}>
+    <AuthContext.Provider value={authContextValue}>
       <Router>
-        {loading ? (
-          <LoadingPage />
-        ) : (
-          <Routes>
-            <Route path="/" element={<LoadingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route
-              path="/main"
-              element={isAuthenticated ? <MainPage /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/exec-order"
-              element={
-                isAuthenticated ? <ExecOrderPage /> : <Navigate to="/login" />
-              }
-            />
-          </Routes>
-        )}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/main" />
+              ) : (
+                <LoadingPage />
+              )
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/main" />
+              ) : (
+                <LoginPage />
+              )
+            }
+          />
+          <Route
+            path="/verify-pending"
+            element={<VerificationPending />}
+          />
+          <Route
+            path="/verify-email"
+            element={<VerificationSuccess />}
+          />
+          <Route
+            path="/main"
+            element={
+              isAuthenticated ? (
+                <MainPage />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+          <Route
+            path="/exec-order"
+            element={
+              isAuthenticated ? (
+                <ExecOrderPage />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+        </Routes>
       </Router>
     </AuthContext.Provider>
   );
