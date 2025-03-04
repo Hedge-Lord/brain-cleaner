@@ -1,6 +1,7 @@
 const multer = require("multer");
 const fetch = require("node-fetch");
 const { generateVideoScript } = require("./scriptGeneration.controller");
+const { generateVideo } = require("./scriptToVideoController");
 
 
 // Set up Multer for file uploads (stores files in memory)
@@ -99,27 +100,45 @@ exports.processPdf = async (req, res) => {
             }
             if (status === "Succeeded") {
                 console.log("Task succeeded:", taskData);
-    try {
-        // Send the taskData to OpenAI for script generation
-        const script = await generateVideoScript(taskData);
-        console.log('Script:', script);
-        
-        return res.status(200).json({
-            message: 'PDF processing and script generation completed successfully',
-            script: script, // openAI part
-            chunkr_data: taskData
-        });
-    } catch (error) {
-        console.error('Error generating script:', error);
-        return res.status(500).json({ 
-            error: 'Script generation failed',
-            chunkr_data: taskData  // Still return Chunkr data even if script gen fails
-        });
-    }
+                try {
+                    // Generate script from Chunkr data
+                    console.log("Generating script from Chunkr data...");
+                    const script = await generateVideoScript(taskData);
+                    
+                    // Generate video from script
+                    console.log("Generating video from script...");
+                    const videoResult = await generateVideo(script);
+                    
+                    return res.status(200).json({
+                        message: 'PDF processing, script generation, and video generation completed successfully',
+                        script: script,
+                        chunkr_data: taskData,
+                        video_url: videoResult.url
+                    });
+                } catch (error) {
+                    console.error('Error in script/video generation:', error);
+                    return res.status(500).json({ 
+                        error: 'Script or video generation failed',
+                        details: error.message,
+                        chunkr_data: taskData
+                    });
+                }
             }
         }
     } catch (error) {
         console.error('Error processing PDF:', error);
-        res.status(500).json({ error: 'Failed to process PDF' });
+        res.status(500).json({ error: 'Failed to process PDF', details: error.message });
     }
-}
+};
+
+// Export Multer middleware
+exports.upload = upload;
+
+// const express = require("express");
+// const router = express.Router();
+// const { upload, processPdf } = require("../controllers/pdfToBrainrot.controller");
+
+// // ✅ Route accepts both file uploads and JSON
+// router.post("/", upload.single("file"), processPdf);
+
+// module.exports = router;
