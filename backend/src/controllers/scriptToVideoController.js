@@ -1,7 +1,5 @@
 require('dotenv').config();
 const Creatomate = require('creatomate');
-const { generateVideoScript } = require('./scriptGeneration.controller');
-// const { textToSpeech } = require('./textToSpeech');
 
 const {
   Polly,
@@ -19,6 +17,9 @@ const {
 const {
   getSignedUrl
 } = require('@aws-sdk/s3-request-presigner');
+
+// Test script - a fun example about space exploration
+const TEST_SCRIPT = `Space exploration has come a long way since the first moon landing. Today, private companies are launching rockets into orbit with incredible precision. Scientists are planning missions to Mars, dreaming of establishing the first human colony on another planet. The James Webb telescope is revealing mysteries of distant galaxies, showing us views of the cosmos we've never seen before. What amazing discoveries await us in the final frontier?`;
 
 if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY || !process.env.AWS_S3_BUCKET_NAME) {
   throw new Error('AWS credentials and S3 bucket name not found in environment variables. Please set AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_S3_BUCKET_NAME');
@@ -94,11 +95,10 @@ async function textToSpeech(text, i) {
   return { text, uploadLocation: presignedUrl, textMarks: marks };
 }
 
-const apiKey = process.env.creatomateAPI;
-console.log('Creatomate API Key:', process.env.creatomateAPI);
+const apiKey = process.env.CREATOMATE_API_KEY;
+console.log('Creatomate API Key:', process.env.CREATOMATE_API_KEY);
 if (!apiKey) {
-  // Your API key can be found under project settings: https://creatomate.com/docs/api/rest-api/authentication
-  console.error('\n\n⚠️  To run this example, please specify your API key as follows: node index.js YOUR_API_KEY');
+  console.error('\n\n⚠️  Please set the CREATOMATE_API_KEY environment variable');
   process.exit(1);
 }
 
@@ -111,9 +111,7 @@ function splitIntoSentences(script) {
 }
 
 const client = new Creatomate.Client(apiKey);
-const chunkrData = {}; // You'll need to replace this with the actual data
-const script = await generateVideoScript(chunkrData); //Not sure if this is properly integrated
-const slides = splitIntoSentences(script);
+const slides = splitIntoSentences(TEST_SCRIPT);
 
 async function run() {
 
@@ -127,8 +125,8 @@ async function run() {
   // Create the video
   const source = new Creatomate.Source({
     outputFormat: 'mp4',
-    width: 1280,
-    height: 720,
+    width: 720,
+    height: 1280,
 
     elements: [
 
@@ -204,5 +202,102 @@ async function run() {
   console.log('Completed:', renders);
 }
 
-run()
-  .catch(error => console.error(error));
+// If this file is run directly (not imported), execute the run function
+if (require.main === module) {
+  console.log('Starting video generation with test script...');
+  console.log('Script split into sentences:', slides);
+  run()
+    .catch(error => console.error('Error during execution:', error));
+}
+
+async function generateVideo(script) {
+  const client = new Creatomate.Client(process.env.CREATOMATE_API_KEY);
+  if (!process.env.CREATOMATE_API_KEY) {
+    throw new Error('Creatomate API key not found in environment variables');
+  }
+
+  const slides = splitIntoSentences(script);
+  console.log('Converting text to speech using AWS Polly...');
+
+  // Convert each text to speech
+  const spokenTexts = await Promise.all(slides.map((text, i) => textToSpeech(text, i)));
+
+  console.log('Creating video with Creatomate...');
+
+  // Create the video
+  const source = new Creatomate.Source({
+    outputFormat: 'mp4',
+    width: 720,
+    height: 1280,
+
+    elements: [
+      ...spokenTexts.map(({ text, uploadLocation, textMarks }) => (
+        new Creatomate.Composition({
+          track: 1,
+          elements: [
+            new Creatomate.Audio({
+              source: uploadLocation,
+            }),
+            new Creatomate.Text({
+              width: '90%',
+              height: '90%',
+              fillColor: 'rgba(255,255,255,0.1)',
+              fontWeight: 800,
+              yAlignment: '50%',
+              text: textMarks.map((mark) => {
+                const spoken = text.substring(0, mark.start);
+                const word = text.substring(mark.start, mark.end);
+                const notSpoken = text.substring(mark.end);
+                const highlightedText = `[color rgba(255,255,255,0.6)]${spoken}[/color]`
+                  + `[color #fff]${word}[/color]`
+                  + notSpoken;
+                return new Creatomate.Keyframe(highlightedText, mark.time / 1000);
+              }),
+            }),
+          ],
+        })
+      )),
+      new Creatomate.Rectangle({
+        track: 2,
+        x: '0%',
+        y: '0%',
+        width: '100%',
+        height: '3%',
+        xAnchor: '0%',
+        yAnchor: '0%',
+        fillColor: 'rgba(255,255,255,0.8)',
+        animations: [
+          new Creatomate.Wipe({
+            xAnchor: '0%',
+            fade: false,
+            easing: 'linear',
+          }),
+        ],
+      }),
+    ],
+  });
+
+  // Render the video
+  const renders = await client.render({ source });
+  
+  if (renders[0].status === 'failed') {
+    throw new Error(`Video generation failed: ${renders[0].errorMessage}`);
+  }
+
+  return {
+    url: renders[0].url,
+    status: renders[0].status,
+    id: renders[0].id
+  };
+}
+
+// Export the main function
+exports.generateVideo = generateVideo;
+
+// If this file is run directly, use the test script
+if (require.main === module) {
+  console.log('Starting video generation with test script...');
+  generateVideo(TEST_SCRIPT)
+    .then(result => console.log('Completed:', result))
+    .catch(error => console.error('Error during execution:', error));
+}
