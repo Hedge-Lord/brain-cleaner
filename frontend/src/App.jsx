@@ -16,6 +16,7 @@ import { jwtDecode } from "jwt-decode";
 import { googleLogout } from '@react-oauth/google';
 
 export const AuthContext = createContext(null);
+const BACKEND_URL = import.meta.env.BACKEND_URL
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -25,7 +26,7 @@ export const useAuth = () => {
   return context;
 };
 
-const API_URL = 'http://localhost:3000/api/v1';
+const API_URL = `http://localhost:3000/api/v1`;
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

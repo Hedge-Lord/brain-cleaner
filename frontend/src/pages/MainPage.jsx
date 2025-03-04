@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../App";
 import "./MainPage.css";
 
+const BACKEND_URL = import.meta.env.BACKEND_URL;
+
 const MainPage = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -20,7 +22,7 @@ const MainPage = () => {
 
   const getS3UploadURL = async (file) => {
     try {
-      const res = await fetch("http://localhost:3000/api/v1/upload-url", {
+      const res = await fetch(`http://localhost:3000/api/v1/upload-url`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fileName: file.name, fileType: file.type }),
@@ -68,7 +70,7 @@ const MainPage = () => {
       console.log("File URL:", fileUrl);
   
       // Send file URL to backend for processing
-      const response = await fetch("http://localhost:3000/api/v1/pdftobrainrot", {
+      const response = await fetch(`http://localhost:3000/api/v1/pdftobrainrot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ file: fileUrl, file_name: selectedFile.name }),

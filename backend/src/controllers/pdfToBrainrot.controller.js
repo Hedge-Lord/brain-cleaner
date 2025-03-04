@@ -102,6 +102,7 @@ exports.processPdf = async (req, res) => {
     try {
         // Send the taskData to OpenAI for script generation
         const script = await generateVideoScript(taskData);
+        console.log('Script:', script);
         
         return res.status(200).json({
             message: 'PDF processing and script generation completed successfully',
@@ -121,60 +122,4 @@ exports.processPdf = async (req, res) => {
         console.error('Error processing PDF:', error);
         res.status(500).json({ error: 'Failed to process PDF' });
     }
-
-    return;
-
-
-    
-
-    console.log(" RAW Chunkr API Response:", text); // Print full response
-
-    try {
-        const data = JSON.parse(text); // Try parsing as JSON
-        console.log("Chunkr API Parsed Response:", data);
-
-        if (!response.ok) {
-            return res.status(500).json({ error: "Failed to process PDF", raw_response: data });
-        }
-
-        // ✅ Extract text from Chunkr's response
-        let extractedText = "";
-        if (data.output && data.output.chunks) {
-            data.output.chunks.forEach(chunk => {
-                chunk.segments.forEach(segment => {
-                    extractedText += segment.text + " ";
-                });
-            });
-        } else {
-            return res.status(500).json({ error: "Invalid Chunkr response format" });
-        }
-
-        console.log(" Extracted Text for Script:", extractedText.substring(0, 500) + "...");
-
-        // ✅ Send extracted text to OpenAI to generate script
-        const script = await generateVideoScript(data);
-
-        // ✅ Return the final script in JSON format
-        return res.status(200).json({
-            message: "Video script generated successfully",
-            script: script
-        });
-
-    } catch (error) {
-        console.error("🔥 Error Parsing JSON:", error);
-        return res.status(500).json({ error: "Invalid JSON response from Chunkr", raw_response: text });
-    }
 }
-
-
-// // Export Multer middleware for routes
-// exports.upload = upload;
-
-// const express = require("express");
-// const router = express.Router();
-// const { upload, processPdf } = require("../controllers/pdfToBrainrot.controller");
-
-// // ✅ Route accepts both file uploads and JSON
-// router.post("/", upload.single("file"), processPdf);
-
-// module.exports = router;
