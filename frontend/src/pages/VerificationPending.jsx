@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import './VerificationPending.css';
 
+const BACKEND_URL = import.meta.env.BACKEND_URL;
+
 const VerificationPending = () => {
   const [isResending, setIsResending] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
@@ -11,7 +13,7 @@ const VerificationPending = () => {
   const handleResendEmail = async () => {
     setIsResending(true);
     try {
-      const response = await fetch('http://localhost:3000/api/v1/auth/resend-verification', {
+      const response = await fetch(`http://localhost:3000/api/v1/auth/resend-verification`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

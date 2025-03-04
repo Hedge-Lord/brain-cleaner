@@ -4,6 +4,8 @@ import { useAuth } from "../App";
 import { GoogleLogin } from '@react-oauth/google';
 import "./LoginPage.css";
 
+const BACKEND_URL = import.meta.env.BACKEND_URL;
+
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login, register, handleGoogleLogin } = useAuth();
@@ -46,7 +48,7 @@ const LoginPage = () => {
 
     try {
       if (isRegistering) {
-        const response = await fetch("http://localhost:3000/api/v1/auth/register", {
+        const response = await fetch(`http://localhost:3000/api/v1/auth/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
