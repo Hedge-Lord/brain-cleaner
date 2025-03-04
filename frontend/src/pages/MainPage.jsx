@@ -9,7 +9,6 @@ const MainPage = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
-  const [previousVideos, setPreviousVideos] = useState([]);
 
   const handleLogout = () => {
     logout();
@@ -29,7 +28,7 @@ const MainPage = () => {
       });
 
       console.log("res", res);
-  
+
       if (!res.ok) throw new Error("Failed to fetch S3 upload URL");
       const { uploadURL } = await res.json();
       return uploadURL;
@@ -38,7 +37,7 @@ const MainPage = () => {
       return null;
     }
   };
-  
+
   const uploadFileToS3 = async (uploadURL, file) => {
     try {
       await fetch(uploadURL, {
@@ -55,37 +54,38 @@ const MainPage = () => {
 
   const handleConversion = async () => {
     if (!selectedFile) return;
-  
+
     try {
       console.log("handleConversion");
       // Generate a pre-signed (temporary) URL without credentials
       const s3UploadURL = await getS3UploadURL(selectedFile);
       console.log("S3 Upload URL:", s3UploadURL);
       if (!s3UploadURL) throw new Error("Failed to get S3 upload URL");
-  
+
       // Upload file to S3 using pre-signed URL
       await uploadFileToS3(s3UploadURL, selectedFile);
       const fileUrl = s3UploadURL.split("?")[0]; // Get public file URL (remove query params if any)
 
       console.log("File URL:", fileUrl);
-  
+
       // Send file URL to backend for processing
-      const response = await fetch(`http://localhost:3000/api/v1/pdftobrainrot`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ file: fileUrl, file_name: selectedFile.name }),
-      });
-  
+      const response = await fetch(
+        "http://localhost:3000/api/v1/pdftobrainrot",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ file: fileUrl, file_name: selectedFile.name }),
+        }
+      );
+
       if (!response.ok) throw new Error("Backend processing failed");
-  
+
       const result = await response.json();
       console.log("Conversion successful:", result);
-  
     } catch (error) {
       console.error("Error during conversion:", error);
     }
   };
-  
 
   return (
     <div className="main-page">
@@ -103,7 +103,11 @@ const MainPage = () => {
       </nav>
 
       <div className="converter-section">
-        <h1>PDF to Video Converter</h1>
+        <h1>turn pdfs to brainrot</h1>
+        <div className="video-placeholder">
+          <h2>nothing here!</h2>
+          <p>upload a file & convert</p>
+        </div>
         <div className="upload-container">
           <input
             type="file"
@@ -112,7 +116,7 @@ const MainPage = () => {
             id="pdf-upload"
           />
           <label htmlFor="pdf-upload" className="upload-btn">
-            {selectedFile ? selectedFile.name : "Select PDF"}
+            {selectedFile ? selectedFile.name : "upload"}
           </label>
           {selectedFile && (
             <button onClick={handleConversion} className="convert-btn">
@@ -120,21 +124,11 @@ const MainPage = () => {
             </button>
           )}
         </div>
-      </div>
-
-      <div className="previous-videos">
-        <h2>Your Previous Videos</h2>
-        <div className="video-grid">
-          {previousVideos.map((video, index) => (
-            <div key={index} className="video-card">
-              <video controls>
-                <source src={video.url} type="video/mp4" />
-              </video>
-              <p>{video.title}</p>
-            </div>
-          ))}
+        <div className="save-container ">
+          <button className="save-btn">save to my videos</button>
         </div>
       </div>
+      <footer>made possible with chunkr.ai</footer>
     </div>
   );
 };
