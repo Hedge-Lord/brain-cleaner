@@ -11,18 +11,25 @@
   top: 20px;
   left: 20px;
   padding: 8px 16px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 20px;
   cursor: pointer;
   font-size: 16px;
-  color: #333;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  background: transparent;
+  color: white;
+  text-decoration: none;
+  border: 2px solid #be9ecb;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-family: "Overpass Mono", monospace;
 }
 
 .back-button:hover {
-  background: #f0f0f0;
+  background: #be9ecb;
+  color: #22143a;
   transform: translateX(-2px);
 }
 
@@ -31,7 +38,6 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #ffffff;
 }
 
 .login-box {
@@ -49,7 +55,6 @@
   margin-bottom: 2rem;
   font-size: 1.8rem;
   font-weight: 500;
-  font-family: "Digital Numbers Regular";
 }
 
 .google-login-container {
@@ -117,7 +122,7 @@
 
 .login-form input:focus {
   outline: none;
-  border-color: #4a90e2;
+  border-color: #be9ecb;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
 }
 
@@ -125,8 +130,8 @@
   width: 120%;
   padding: 0.75rem;
   background: transparent;
-  color: black;
-  border: 2px solid black;
+  color: #22143a;
+  border: 2px solid #22143a;
   border-radius: 6px;
   font-size: 0.95rem;
   font-weight: 500;
