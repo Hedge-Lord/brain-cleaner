@@ -50,6 +50,7 @@
   margin-bottom: 2rem;
   font-size: 1.8rem;
   font-weight: 500;
+  font-family: 'Digital Numbers Regular';
 }
 
 .google-login-container {
@@ -124,9 +125,9 @@
 .login-form button[type="submit"] {
   width: 120%;
   padding: 0.75rem;
-  background: #4a90e2;
-  color: white;
-  border: none;
+  background: transparent;
+  color: black;
+  border: 2px solid black;
   border-radius: 6px;
   font-size: 0.95rem;
   font-weight: 500;
@@ -135,12 +136,14 @@
 }
 
 .login-form button[type="submit"]:hover {
-  background: #357abd;
+  background: rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
 
 .login-form button[type="submit"]:disabled {
-  background: #e0e0e0;
+  background: rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  color: rgba(0, 0, 0, 0.4);
   cursor: not-allowed;
   transform: none;
 }

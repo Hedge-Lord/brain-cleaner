@@ -20,7 +20,6 @@
 .home-content p {
   font-size: 1.2rem;
   color: #666;
-  margin-bottom: 2rem;
 }
 
 .cta-buttons {
@@ -32,9 +31,10 @@
 .get-started-btn {
   display: inline-block;
   padding: 0.75rem 2rem;
-  background: #4a90e2;
-  color: white;
+  background: transparent;
+  color: black;
   text-decoration: none;
+  border: 2px solid black;
   border-radius: 6px;
   font-size: 1.1rem;
   font-weight: 500;
@@ -42,6 +42,21 @@
 }
 
 .get-started-btn:hover {
-  background: #357abd;
+  background: black;
+  color: white;
   transform: translateY(-1px);
+}
+
+.home-container .home-content h1 {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700; /* Replace <weight> with the desired value, e.g., 400, 500, 700 */
+  font-style: normal;
+}
+
+.home-container .home-content .cta-buttons .get-started-btn{
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
 }
