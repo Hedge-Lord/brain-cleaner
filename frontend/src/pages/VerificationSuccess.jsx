@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './VerificationSuccess.css';
 
+const BACKEND_URL = import.meta.env.BACKEND_URL;
+
 const VerificationSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
