@@ -3,14 +3,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 1000;
 }
 
-.nav-left, .nav-right {
+.nav-left,
+.nav-right {
   display: flex;
   gap: 2rem;
   align-items: center;
@@ -35,7 +34,7 @@
 }
 
 .page-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   text-align: center;
   margin: 2rem 0;
   font-size: 2rem;
@@ -54,7 +53,7 @@
 .video-card {
   background: transparent;
   border-radius: 8px;
-  border: 2px solid black;
+  border: 2px solid #be9ecb;
   overflow: hidden;
   transition: transform 0.2s ease;
 }
@@ -83,22 +82,19 @@
   padding: 1rem;
   margin: 0;
   font-size: 1rem;
-  font-weight: 500;
-  color: #333;
-  border-top: 2px solid black;
+  font-weight: 400;
+  color: white;
+  border-top: 2px solid #be9ecb;
 }
 
 .saved-videos {
   min-height: 100vh;
-  background-color: #f0f8ff;
 }
 
 .saved-videos .page-title {
-    font-family: "Inter", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 700;
-    font-style: normal;
-    color: black;
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 00;
+  font-style: normal;
+  color: white;
 }
-
-
