@@ -10,6 +10,7 @@ const MainPage = () => {
   const { user, logout } = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previousVideos, setPreviousVideos] = useState([]);
+  const [videoUrl, setVideoUrl] = useState(null);
 
   const handleLogout = () => {
     logout();
@@ -78,9 +79,13 @@ const MainPage = () => {
   
       if (!response.ok) throw new Error("Backend processing failed");
   
-      const result = await response.json();
-      console.log("Conversion successful:", result);
-  
+      const data = await response.json();
+      
+      if (data.video_url) {
+        setVideoUrl(data.video_url);
+      }
+      
+      console.log("Conversion successful:", data);
     } catch (error) {
       console.error("Error during conversion:", error);
     }
@@ -135,6 +140,19 @@ const MainPage = () => {
           ))}
         </div>
       </div>
+
+      {videoUrl && (
+        <div className="video-container">
+          <video 
+            controls
+            width="100%"
+            style={{ maxWidth: '800px', margin: '20px auto' }}
+          >
+            <source src={videoUrl} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      )}
     </div>
   );
 };
