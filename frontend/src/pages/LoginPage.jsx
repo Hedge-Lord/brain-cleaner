@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../App";
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from "@react-oauth/google";
 import "./LoginPage.css";
 
 const BACKEND_URL = import.meta.env.BACKEND_URL;
@@ -28,7 +28,7 @@ const LoginPage = () => {
         setError(result.error || "Google login failed");
       }
     } catch (err) {
-      console.error('Google auth error:', err);
+      console.error("Google auth error:", err);
       setError("An unexpected error occurred during Google login");
     } finally {
       setIsLoading(false);
@@ -39,7 +39,7 @@ const LoginPage = () => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-    
+
     if (!formData.email || !formData.password) {
       setError("Email and password are required");
       setIsLoading(false);
@@ -48,19 +48,22 @@ const LoginPage = () => {
 
     try {
       if (isRegistering) {
-        const response = await fetch(`http://localhost:3000/api/v1/auth/register`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
+        const response = await fetch(
+          "http://localhost:3000/api/v1/auth/register",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          }
+        );
 
         const data = await response.json();
 
         if (response.ok) {
           // Instead of logging in directly, redirect to verification pending
-          navigate('/verify-pending', { state: { email: formData.email } });
+          navigate("/verify-pending", { state: { email: formData.email } });
         } else {
           setError(data.message || "Registration failed");
         }
@@ -74,7 +77,7 @@ const LoginPage = () => {
         }
       }
     } catch (err) {
-      console.error('Auth error:', err);
+      console.error("Auth error:", err);
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -89,14 +92,17 @@ const LoginPage = () => {
 
   return (
     <div className="login-container">
+      <Link to="/" className="back-button">
+        back
+      </Link>
       <div className="login-box">
         <h2>{isRegistering ? "Create Account" : "Log In"}</h2>
-        
+
         <div className="google-login-container">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => {
-              setError('Google Login Failed');
+              setError("Google Login Failed");
             }}
             auto_select
           />
@@ -107,7 +113,7 @@ const LoginPage = () => {
         </div>
 
         {error && <div className="error-message">{error}</div>}
-        
+
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <input
@@ -139,7 +145,7 @@ const LoginPage = () => {
               : "Log In"}
           </button>
         </form>
-        
+
         <div className="auth-switch">
           <span>
             {isRegistering
