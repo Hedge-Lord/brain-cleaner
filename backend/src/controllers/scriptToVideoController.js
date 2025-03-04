@@ -97,7 +97,6 @@ async function textToSpeech(text, i) {
 }
 
 const apiKey = process.env.CREATOMATE_API_KEY;
-console.log('Creatomate API Key:', process.env.CREATOMATE_API_KEY);
 if (!apiKey) {
   console.error('\n\n⚠️  Please set the CREATOMATE_API_KEY environment variable');
   process.exit(1);
@@ -310,6 +309,7 @@ async function generateVideo(script) {
       ContentType: 'video/mp4',
     },
   }).done();
+  console.log("Finished Uploading")
   
   // Generate a pre-signed URL for the video in S3 (valid for 24 hours)
   const command = new GetObjectCommand({

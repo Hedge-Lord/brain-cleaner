@@ -164,14 +164,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 2rem auto;
   width: 100%;
-  max-width: 600px;  /* Reduced from 800px */
-  padding: 0 1rem;
+  height: 100%;
+  padding: 0.5rem;
 }
 
 .video-container video {
   width: 100%;
+  max-height: 300px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -229,6 +229,19 @@ h2 {
   }
 }
 
+/* Button spinner for saving */
+.btn-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
 /* Temporary video preview styles */
 .temp-video-container {
   width: 100%;
@@ -262,4 +275,15 @@ footer {
   align-items: center;
   padding: 1rem;
   font-family: "Qverpass Mono", monospace;
+}
+
+.status-message {
+  color: #be9ecb;
+  font-weight: bold;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  border: 1px solid #be9ecb;
+  display: inline-block;
 }
