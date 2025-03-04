@@ -11,6 +11,8 @@ const MainPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previousVideos, setPreviousVideos] = useState([]);
   const [videoUrl, setVideoUrl] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [tempVideoUrl, setTempVideoUrl] = useState(null);
 
   const handleLogout = () => {
     logout();
@@ -18,7 +20,14 @@ const MainPage = () => {
   };
 
   const handleFileUpload = (e) => {
-    setSelectedFile(e.target.files[0]);
+    const file = e.target.files[0];
+    setSelectedFile(file);
+    
+    // Create temporary URL for the uploaded file
+    if (file) {
+      const tempUrl = URL.createObjectURL(file);
+      setTempVideoUrl(tempUrl);
+    }
   };
 
   const getS3UploadURL = async (file) => {
@@ -58,6 +67,7 @@ const MainPage = () => {
     if (!selectedFile) return;
 
     try {
+      setIsLoading(true);
       console.log("handleConversion");
       // Generate a pre-signed (temporary) URL without credentials
       const s3UploadURL = await getS3UploadURL(selectedFile);
@@ -91,6 +101,8 @@ const MainPage = () => {
       console.log("Conversion successful:", data);
     } catch (error) {
       console.error("Error during conversion:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,8 +124,31 @@ const MainPage = () => {
       <div className="converter-section">
         <h1>turn pdfs to brainrot</h1>
         <div className="video-placeholder">
-          <h2>nothing here!</h2>
-          <p>upload a file & convert</p>
+          {isLoading ? (
+            <div className="loading-indicator">
+              <h2>Generating Video...</h2>
+              <div className="spinner"></div>
+              <p>Please wait while we process your file</p>
+            </div>
+          ) : tempVideoUrl && !videoUrl ? (
+            <div className="temp-video-container">
+              <h2>Uploaded File Preview</h2>
+              <p>Click "Convert to Video" to process</p>
+              <object
+                data={tempVideoUrl}
+                type={selectedFile?.type}
+                width="100%"
+                height="300px"
+              >
+                <p>Preview not available</p>
+              </object>
+            </div>
+          ) : !videoUrl ? (
+            <>
+              <h2>nothing here!</h2>
+              <p>upload a file & convert</p>
+            </>
+          ) : null}
         </div>
         <div className="upload-container">
           <input
@@ -126,13 +161,17 @@ const MainPage = () => {
             {selectedFile ? selectedFile.name : "upload"}
           </label>
           {selectedFile && (
-            <button onClick={handleConversion} className="convert-btn">
-              Convert to Video
+            <button 
+              onClick={handleConversion} 
+              className="convert-btn"
+              disabled={isLoading}
+            >
+              {isLoading ? "Processing..." : "Convert to Video"}
             </button>
           )}
         </div>
         <div className="save-container ">
-          <button className="save-btn">save to my videos</button>
+          <button className="save-btn" disabled={!videoUrl || isLoading}>save to my videos</button>
         </div>
       </div>
 
