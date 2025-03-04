@@ -8,8 +8,8 @@ import { useState, createContext, useContext, useEffect } from "react";
 import "./App.css";
 import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
-import ExecOrderPage from "./pages/ExecOrderPage";
 import LoadingPage from "./pages/LoadingPage";
+import SavedVideos from "./pages/SavedVideos";
 import VerificationPending from "./pages/VerificationPending";
 import VerificationSuccess from "./pages/VerificationSuccess";
 import { jwtDecode } from "jwt-decode";
@@ -198,10 +198,10 @@ function App() {
             }
           />
           <Route
-            path="/exec-order"
+            path="/saved-videos"
             element={
               isAuthenticated ? (
-                <ExecOrderPage />
+                <SavedVideos />
               ) : (
                 <Navigate to="/" />
               )

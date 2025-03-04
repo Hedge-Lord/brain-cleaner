@@ -92,7 +92,7 @@ const MainPage = () => {
       <nav className="navbar">
         <div className="nav-left">
           <Link to="/main">Home</Link>
-          <Link to="/exec-order">Exec Order</Link>
+          <Link to="/saved-videos">Saved Videos</Link>
         </div>
         <div className="nav-right">
           <span className="user-email">{user?.email}</span>
