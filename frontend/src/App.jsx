@@ -3,6 +3,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation
 } from "react-router-dom";
 import { useState, createContext, useContext, useEffect } from "react";
 import "./App.css";
@@ -28,14 +29,35 @@ export const useAuth = () => {
 
 const API_URL = `http://localhost:3000/api/v1`;
 
+// This component wraps our app and persists the current route
+const RouteTracker = ({ children }) => {
+  const location = useLocation();
+  
+  useEffect(() => {
+    // Store the current path whenever it changes
+    if (location.pathname !== '/' && location.pathname !== '/login') {
+      localStorage.setItem('lastRoute', location.pathname);
+    }
+  }, [location]);
+  
+  return children;
+};
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [lastRoute, setLastRoute] = useState('/main');
 
   useEffect(() => {
     // Check if user is already logged in
     const token = localStorage.getItem('token');
     const googleToken = localStorage.getItem('googleToken');
+    
+    // Get last route if available
+    const storedRoute = localStorage.getItem('lastRoute');
+    if (storedRoute) {
+      setLastRoute(storedRoute);
+    }
     
     if (googleToken) {
       try {
@@ -142,6 +164,7 @@ function App() {
     }
     // Handle regular logout
     localStorage.removeItem('token');
+    localStorage.removeItem('lastRoute'); // Clear the last route on logout
     setIsAuthenticated(false);
     setUser(null);
   };
@@ -158,56 +181,58 @@ function App() {
   return (
     <AuthContext.Provider value={authContextValue}>
       <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              isAuthenticated ? (
-                <Navigate to="/main" />
-              ) : (
-                <LoadingPage />
-              )
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              isAuthenticated ? (
-                <Navigate to="/main" />
-              ) : (
-                <LoginPage />
-              )
-            }
-          />
-          <Route
-            path="/verify-pending"
-            element={<VerificationPending />}
-          />
-          <Route
-            path="/verify-email"
-            element={<VerificationSuccess />}
-          />
-          <Route
-            path="/main"
-            element={
-              isAuthenticated ? (
-                <MainPage />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/saved-videos"
-            element={
-              isAuthenticated ? (
-                <SavedVideos />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-        </Routes>
+        <RouteTracker>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                isAuthenticated ? (
+                  <Navigate to={lastRoute} />
+                ) : (
+                  <LoadingPage />
+                )
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                isAuthenticated ? (
+                  <Navigate to={lastRoute} />
+                ) : (
+                  <LoginPage />
+                )
+              }
+            />
+            <Route
+              path="/verify-pending"
+              element={<VerificationPending />}
+            />
+            <Route
+              path="/verify-email"
+              element={<VerificationSuccess />}
+            />
+            <Route
+              path="/main"
+              element={
+                isAuthenticated ? (
+                  <MainPage />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+            <Route
+              path="/saved-videos"
+              element={
+                isAuthenticated ? (
+                  <SavedVideos />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+          </Routes>
+        </RouteTracker>
       </Router>
     </AuthContext.Provider>
   );

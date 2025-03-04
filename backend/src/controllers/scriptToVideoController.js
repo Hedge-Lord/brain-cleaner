@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Creatomate = require('creatomate');
+const fetch = require('node-fetch');
 
 const {
   Polly,
@@ -96,7 +97,6 @@ async function textToSpeech(text, i) {
 }
 
 const apiKey = process.env.CREATOMATE_API_KEY;
-console.log('Creatomate API Key:', process.env.CREATOMATE_API_KEY);
 if (!apiKey) {
   console.error('\n\n⚠️  Please set the CREATOMATE_API_KEY environment variable');
   process.exit(1);
@@ -284,8 +284,44 @@ async function generateVideo(script) {
     throw new Error(`Video generation failed: ${renders[0].errorMessage}`);
   }
 
+  // Download the video from Creatomate
+  console.log('Downloading video from Creatomate...');
+  const videoResponse = await fetch(renders[0].url);
+  
+  if (!videoResponse.ok) {
+    throw new Error(`Failed to download video: ${videoResponse.status} ${videoResponse.statusText}`);
+  }
+  
+  const videoBuffer = await videoResponse.buffer();
+  
+  // Generate a unique filename using timestamp
+  const timestamp = new Date().getTime();
+  const videoKey = `videos/video_${timestamp}.mp4`;
+  
+  // Upload the video to S3
+  console.log('Uploading video to AWS S3...');
+  const uploadResult = await new Upload({
+    client: s3,
+    params: {
+      Body: videoBuffer,
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: videoKey,
+      ContentType: 'video/mp4',
+    },
+  }).done();
+  console.log("Finished Uploading")
+  
+  // Generate a pre-signed URL for the video in S3 (valid for 24 hours)
+  const command = new GetObjectCommand({
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: videoKey,
+  });
+  const s3Url = await getSignedUrl(s3, command, { expiresIn: 86400 });
+
   return {
-    url: renders[0].url,
+    creatomateUrl: renders[0].url,
+    s3Url: s3Url,
+    s3Key: videoKey,
     status: renders[0].status,
     id: renders[0].id
   };

@@ -29,7 +29,7 @@ const extractTextFromChunkr = (chunkrData) => {
 
     let combinedText = segments.join("\n\n").split(/\s+/);
     // Extract first 4000 words of text from Chunkr's response
-    const max_script_length = 8000;
+    const max_script_length = 4500;
     if (combinedText.length > max_script_length) {
       combinedText = combinedText.slice(0, max_script_length).join(" ");
     }

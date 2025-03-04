@@ -113,7 +113,9 @@ exports.processPdf = async (req, res) => {
                         message: 'PDF processing, script generation, and video generation completed successfully',
                         script: script,
                         chunkr_data: taskData,
-                        video_url: videoResult.url
+                        video_url: videoResult.creatomateUrl,
+                        s3_video_url: videoResult.s3Url,
+                        s3_video_key: videoResult.s3Key
                     });
                 } catch (error) {
                     console.error('Error in script/video generation:', error);
