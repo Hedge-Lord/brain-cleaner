@@ -1,5 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Overpass+Mono:wght@400;500;600;700&display=swap");
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif,
+    "Overpass Mono";
   line-height: 1.5;
   font-weight: 400;
 
@@ -56,8 +59,11 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: rgba(255, 255, 255, 0.87);
+    background: linear-gradient(to bottom, #22143a, #4c1d38);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
   }
   a:hover {
     color: #747bff;
