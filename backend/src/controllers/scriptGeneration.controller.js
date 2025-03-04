@@ -51,8 +51,8 @@ exports.generateVideoScript = async (chunkrData) => {
         - Limit the script to **around 1 minute** (~700 words max).
 
         Here is the input text:
-        ${extractedText}
-        `;
+        ${JSON.stringify(extractedText, null, 2)}
+`;
 
         // Send request to OpenAI
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
