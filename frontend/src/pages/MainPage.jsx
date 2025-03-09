@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../App";
 import "./MainPage.css";
@@ -16,6 +16,9 @@ const MainPage = () => {
   const [tempVideoUrl, setTempVideoUrl] = useState(null);
   const [videoData, setVideoData] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('idle'); // 'idle', 'uploading', 'processing', 'completed'
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
+  const [videoTitle, setVideoTitle] = useState('Untitled #');
 
   const handleLogout = () => {
     logout();
@@ -116,6 +119,14 @@ const MainPage = () => {
     }
   };
 
+  const handleSaveButtonClick = () => {
+    if (!videoUrl || !user || !videoData) return;
+    
+    // Set default title based on the PDF name if available
+    setVideoTitle(selectedFile ? selectedFile.name.replace('.pdf', '') : 'Untitled #');
+    setShowPopup(true);
+  };
+
   const handleSaveVideo = async () => {
     if (!videoUrl || !user || !videoData) return;
     
@@ -126,7 +137,7 @@ const MainPage = () => {
       // This is temporary storage, but good enough for this demo
       const videoInfo = {
         userId: user.sub || user.id || user._id,
-        title: selectedFile ? selectedFile.name.replace('.pdf', '') : 'Untitled Video',
+        title: videoTitle,
         s3Key: videoData.s3_key || `video_${Date.now()}`,
         s3Url: videoUrl,
         creatomateUrl: videoData.creatomate_url || '',
@@ -144,8 +155,10 @@ const MainPage = () => {
       
       console.log('Video saved to localStorage:', videoInfo);
       
-      // Show success message and navigate
-      alert('Video saved successfully!');
+      // Close popup
+      setShowPopup(false);
+      
+      // Navigate to saved videos page
       navigate('/saved-videos');
       
     } catch (error) {
@@ -154,6 +167,13 @@ const MainPage = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // No auto-close for the popup as we need user interaction
+
+  // Function to handle popup close button
+  const handleClosePopup = () => {
+    setShowPopup(false);
   };
 
   return (
@@ -236,7 +256,7 @@ const MainPage = () => {
           <button 
             className="save-btn" 
             disabled={!videoUrl || isLoading || isSaving}
-            onClick={handleSaveVideo}
+            onClick={handleSaveButtonClick}
           >
             {isSaving ? (
               <>
@@ -249,6 +269,40 @@ const MainPage = () => {
         </div>
       </div>
       <footer>made possible with chunkr.ai</footer>
+
+      {/* Popup Component */}
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <button className="popup-close" onClick={handleClosePopup}>
+              ×
+            </button>
+            <h3>save to my videos</h3>
+            <div className="popup-input-container">
+              <label htmlFor="video-title">name:</label>
+              <input 
+                type="text" 
+                id="video-title" 
+                value={videoTitle}
+                onChange={(e) => setVideoTitle(e.target.value)}
+                className="popup-input"
+              />
+            </div>
+            <div className="popup-buttons">
+              <button className="popup-btn cancel-btn" onClick={handleClosePopup}>
+                cancel
+              </button>
+              <button 
+                className="popup-btn save-btn" 
+                onClick={handleSaveVideo}
+                disabled={isSaving}
+              >
+                {isSaving ? 'saving...' : 'save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

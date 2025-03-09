@@ -299,32 +299,32 @@ async function generateVideo(script) {
   const videoKey = `videos/video_${timestamp}.mp4`;
   
   // Upload the video to S3
-  console.log('Uploading video to AWS S3...');
-  const uploadResult = await new Upload({
-    client: s3,
-    params: {
-      Body: videoBuffer,
-      Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: videoKey,
-      ContentType: 'video/mp4',
-    },
-  }).done();
-  console.log("Finished Uploading")
+  // console.log('Uploading video to AWS S3...');
+  // const uploadResult = await new Upload({
+  //   client: s3,
+  //   params: {
+  //     Body: videoBuffer,
+  //     Bucket: process.env.AWS_S3_BUCKET_NAME,
+  //     Key: videoKey,
+  //     ContentType: 'video/mp4',
+  //   },
+  // }).done();
+  // console.log("Finished Uploading")
   
-  // Generate a pre-signed URL for the video in S3 (valid for 24 hours)
-  const command = new GetObjectCommand({
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Key: videoKey,
-  });
-  const s3Url = await getSignedUrl(s3, command, { expiresIn: 86400 });
+  // // Generate a pre-signed URL for the video in S3 (valid for 24 hours)
+  // const command = new GetObjectCommand({
+  //   Bucket: process.env.AWS_S3_BUCKET_NAME,
+  //   Key: videoKey,
+  // });
+  // const s3Url = await getSignedUrl(s3, command, { expiresIn: 86400 });
 
-  return {
-    creatomateUrl: renders[0].url,
-    s3Url: s3Url,
-    s3Key: videoKey,
-    status: renders[0].status,
-    id: renders[0].id
-  };
+  // return {
+  //   creatomateUrl: renders[0].url,
+  //   s3Url: s3Url,
+  //   s3Key: videoKey,
+  //   status: renders[0].status,
+  //   id: renders[0].id
+  // };
 }
 
 // Export the main function

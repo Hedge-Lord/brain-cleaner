@@ -287,3 +287,125 @@ footer {
   border: 1px solid #be9ecb;
   display: inline-block;
 }
+
+/* Popup Styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.popup-content {
+  background-color: #22143a; /* Match website background */
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 350px;
+  text-align: left;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease-out;
+}
+
+.popup-content h3 {
+  color: white;
+  font-size: 1.1rem;
+  margin: 0 0 1.2rem 0;
+  font-weight: 400;
+  text-align: left;
+}
+
+.popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid white;
+  border-radius: 50%;
+}
+
+.popup-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.popup-input-container {
+  margin-bottom: 1.5rem;
+}
+
+.popup-input-container label {
+  color: white;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+}
+
+.popup-input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+  color: white;
+  font-size: 0.9rem;
+  padding: 0.3rem 0.5rem;
+  width: calc(100% - 4rem);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.popup-input:focus {
+  border-bottom-color: white;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.popup-btn {
+  background-color: transparent;
+  border: 1px solid white;
+  border-radius: 4px;
+  color: white;
+  padding: 0.4rem 1.2rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.popup-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.popup-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
