@@ -1,0 +1,10 @@
+{
+    "build": {
+      "builder": "NIXPACKS",
+      "buildCommand": "npm run build"
+    },
+    "deploy": {
+      "restartPolicyType": "ON_FAILURE",
+      "startCommand": "npm run preview -- --host 0.0.0.0 --port $PORT"
+    }
+}

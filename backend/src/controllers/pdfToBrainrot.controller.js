@@ -1,6 +1,7 @@
 const multer = require("multer");
 const fetch = require("node-fetch");
-const { generateVideoScript } = require("./scriptGeneration.controller");
+// const { generateVideoScript } = require("./scriptGeneration.controller");
+const { generateVideoScript } = require("./geminiScriptGeneration");
 const { generateVideo } = require("./scriptToVideoController");
 
 
