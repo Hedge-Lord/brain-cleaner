@@ -3,6 +3,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: #be9ecb;
 }
 
 .nav-left,
@@ -14,8 +15,8 @@
 
 .navbar a {
   text-decoration: none;
-  color: #333;
-  font-weight: 500;
+  color: #be9ecb;
+  font-weight: 400;
   font-size: 1.1rem;
   transition: color 0.2s;
 }
