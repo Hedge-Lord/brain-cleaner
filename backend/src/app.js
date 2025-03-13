@@ -9,13 +9,10 @@ const videosRoutes = require('./routes/videos.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const cors = require('cors');
-app.use(cors()); 
 // Increase request size limit
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
-
-app.use(cors());
+app.use(cors({ origin: "https://brain-cleaner-production.up.railway.app/" }));
 app.use(bodyParser.json());
 app.use('/api/v1/pdftobrainrot', pdftoroute);
 app.use('/api/v1/upload-url', uploadURL);
