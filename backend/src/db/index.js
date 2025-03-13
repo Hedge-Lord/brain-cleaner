@@ -3,7 +3,7 @@ require('dotenv').config();
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgres://danielwu:Danielw6@localhost:5432/brain_cleaner'
+  connectionString: process.env.DATABASE_URL
 });
 
 pool.on('error', (err) => {
