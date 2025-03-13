@@ -27,7 +27,7 @@ export const useAuth = () => {
   return context;
 };
 
-const API_URL = `http://localhost:3000/api/v1`;
+const API_URL = `${import.meta.env.VITE_SERVER_URL}/api/v1`;
 
 // This component wraps our app and persists the current route
 const RouteTracker = ({ children }) => {

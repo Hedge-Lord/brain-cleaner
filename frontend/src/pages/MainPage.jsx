@@ -35,7 +35,7 @@ const MainPage = () => {
 
   const getS3UploadURL = async (file) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/upload-url`, {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/v1/upload-url`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fileName: file.name, fileType: file.type }),
@@ -89,7 +89,7 @@ const MainPage = () => {
 
       // Send file URL to backend for processing
       const response = await fetch(
-        "http://localhost:3000/api/v1/pdftobrainrot",
+        `${import.meta.env.VITE_SERVER_URL}/api/v1/pdftobrainrot`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
