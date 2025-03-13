@@ -49,7 +49,7 @@ const LoginPage = () => {
     try {
       if (isRegistering) {
         const response = await fetch(
-          "http://localhost:3000/api/v1/auth/register",
+          "https://brain-cleaner-production.up.railway.app/api/v1/auth/register",
           {
             method: "POST",
             headers: {

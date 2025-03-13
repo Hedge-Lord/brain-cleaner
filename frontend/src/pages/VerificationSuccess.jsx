@@ -14,7 +14,7 @@ const VerificationSuccess = () => {
   useEffect(() => {
     const verifyEmail = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/v1/auth/verify-email?token=${token}`);
+        const response = await fetch(`https://brain-cleaner-production.up.railway.app/api/v1/auth/verify-email?token=${token}`);
         const data = await response.json();
         
         if (!response.ok) {
