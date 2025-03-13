@@ -9,7 +9,8 @@ const videosRoutes = require('./routes/videos.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
+const cors = require('cors');
+app.use(cors()); 
 // Increase request size limit
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
